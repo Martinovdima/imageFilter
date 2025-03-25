@@ -4,15 +4,16 @@ import os
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
+from dotenv import load_dotenv
 from bd import init_db
 from functions import set_bot_commands
 from app.handlers import router
-from config import TOKEN
 
-bot = Bot(token=TOKEN)
+
+load_dotenv()
+bot = Bot(os.getenv('TOKEN'))
 dp = Dispatcher(storage=MemoryStorage())
 
-# Убедитесь, что папка существует
 os.makedirs("infotos", exist_ok=True)
 os.makedirs("outfotos", exist_ok=True)
 

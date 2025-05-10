@@ -7,10 +7,14 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram import types
 from bd import create_or_get_user, add_image_processing_request, update_processed_image
 import app.keyboard as kb
+from app.keyboard import ARTS
 import os
 import traceback
 from aiogram.utils.chat_action import ChatActionSender
-from functions import convert_to_pixel_openCV, convert_to_cartoon_openCV, convert_to_pencil_openCV
+from functions import (apply_pixel, apply_cartoon, apply_pencil, apply_sepia,
+                       apply_black_white, apply_hdr, apply_blur_background,
+                       apply_vintage, apply_oil_painting, apply_color_splash_red,
+                       apply_glitch)
 
 
 router = Router()
@@ -61,7 +65,8 @@ async def process_image(message: types.Message, state: FSMContext):
             user_data = await state.get_data()
             selected_art = user_data.get("selected_art")
 
-            if selected_art not in ['PIXEL', 'CARTOON', 'PENCIL']:
+            # if selected_art not in ['PIXEL', 'CARTOON', 'PENCIL', 'SEPIA', 'BLK&WHT']:
+            if selected_art not in ARTS:
                 text = "❗ Сначала нужно выбрать формат\n\n📸 Выбирай... 📸"
                 await message.answer(text=text, reply_markup=await kb.art_keyboard())
                 return
@@ -102,11 +107,27 @@ async def process_image(message: types.Message, state: FSMContext):
 
             # Применяем фильтр
             if selected_art == 'PIXEL':
-                processed_photo_path = await convert_to_pixel_openCV(save_path, file_name)
+                processed_photo_path = await apply_pixel(save_path, file_name)
             elif selected_art == 'CARTOON':
-                processed_photo_path = await convert_to_cartoon_openCV(save_path, file_name)
+                processed_photo_path = await apply_cartoon(save_path, file_name)
             elif selected_art == 'PENCIL':
-                processed_photo_path = await convert_to_pencil_openCV(save_path, file_name)
+                processed_photo_path = await apply_pencil(save_path, file_name)
+            elif selected_art == 'SEPIA':
+                processed_photo_path = await apply_sepia(save_path, file_name)
+            elif selected_art == 'BLK&WHT':
+                processed_photo_path = await apply_black_white(save_path, file_name)
+            elif selected_art == 'HDR':
+                processed_photo_path = await apply_hdr(save_path, file_name)
+            elif selected_art == 'BLUR':
+                processed_photo_path = await apply_blur_background(save_path, file_name)
+            elif selected_art == 'VINTAGE':
+                processed_photo_path = await apply_vintage(save_path, file_name)
+            elif selected_art == 'OIL':
+                processed_photo_path = await apply_oil_painting(save_path, file_name)
+            elif selected_art == 'SPLASH':
+                processed_photo_path = await apply_color_splash_red(save_path, file_name)
+            elif selected_art == 'GLITCH':
+                processed_photo_path = await apply_glitch(save_path, file_name)
             else:
                 await message.answer(f"❌ Такого формата нет!")
                 return
